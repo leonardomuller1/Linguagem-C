@@ -1,5 +1,5 @@
 /*
- * @brief   mega sena com criptografia
+ * @brief   sequência numérica
  * @author  Leonardo Muller
  *
  * @version 0.1
