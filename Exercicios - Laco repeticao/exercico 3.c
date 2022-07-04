@@ -1,5 +1,5 @@
 /*
- * @brief   sequência numérica
+ * @brief   cartão da megasena
  * @author  Leonardo Muller
  *
  * @version 0.1
