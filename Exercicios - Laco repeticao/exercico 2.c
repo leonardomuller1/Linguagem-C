@@ -1,5 +1,5 @@
 /*
- * @brief   sequência numérica
+ * @brief   resto 5
  * @author  Leonardo Muller
  *
  * @version 0.1
