@@ -1,0 +1,46 @@
+/*
+ * @brief   calculadora de resistores paralelo
+ * @author  Leonardo Muller
+ *
+ * @version 0.1
+ * @date    set/2022
+ */
+
+/*
+Questao:
+Dados os valores de Vin e Vout do divisor de tensão representado abaixo, calcule a
+relação R2/R1 necessária para construção deste divisor.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+// prototipo
+float CalculoResistor(float vin, float vout,float resistordado);
+
+int main()
+{
+    do{
+    float vin,vout, corrente, resistor,resistordado;
+    printf("Diga-me a tensao do vin: (V)\n");
+    scanf("%f", &vin);
+    printf("\nDiga-me a tensao do vout: (V)\n");
+    scanf("%f", &vout);
+    printf("\nDiga-me qual o valor do resistor 1: (omh)\n");
+    scanf("%f", &resistordado);
+    resistor = CalculoResistor(vin, vout,resistordado);
+    printf("\n\nA resistor R1 %.2f omh e R2 %.2f omh\n",resistordado,resistor);
+
+    } while (1);
+    
+}
+
+float CalculoResistor(float vin, float vout,float resistordado)
+{
+    float resistor,correnteresistordado;
+
+    correnteresistordado = vin / resistordado;
+
+    resistor = vout/correnteresistordado;
+
+    return resistor;
+    }
+
