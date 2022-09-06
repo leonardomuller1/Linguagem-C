@@ -37,6 +37,6 @@ do{
 
 float SinalParaFrequencia(float sinal){
     float frequencia;
-    frequencia = 1/sinal; // F = 1/ T
+    frequencia = T/2*3.14; // F = 1/ T
     return frequencia;
 }
