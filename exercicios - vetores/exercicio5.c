@@ -32,8 +32,8 @@ for (i = 0; i < 25; i++) {
      }
    }
  }
-printf("\nElementos do vetor em ordem crescente:\n");
-for (i = 0; i < 25; i++) {
+printf("\nElementos do vetor em ordem decrescente :\n");
+for (i = 24; i > 0 ; i--) {
  printf("%4d ", numeros[i]);
 }
 return 0;
