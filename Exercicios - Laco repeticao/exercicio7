@@ -1,0 +1,36 @@
+/******************************************************************************
+Crie um vetor de 50 números inteiros, preenchido com valores aleatórios.
+Identifique e exiba todos os números primos contidos neste vetor.
+*******************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int main()
+{
+ //variaveis 
+ int numeros[50];
+ int i, primo;
+ 
+ // geracao dos valores
+ for (i = 0; i < 50; i++) {
+ numeros[i]=rand()%10;// limite de até 1000
+ }
+ //testes e exibição
+for (i = 0; i < 50; i++) {
+    
+      for (int x = 1; x <=numeros[i]; x++) {
+          printf("%d\n\n", numeros[i]);
+        if(numeros[i] % x == 0){
+          primo++;
+          printf("%d", primo);
+        }
+      }
+      if(primo==2){
+
+    //Mostra na tela os numeros primos um a um
+    printf("%d", numeros[i]);
+    }
+}
+return 0;
+}
