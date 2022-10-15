@@ -12,6 +12,8 @@ int main()
  int numeros[25];
  int i, aux, contador;
  
+ srand(time(NULL)); // deixa "aleatorio" a geracao dos valores
+ 
  // geracao dos valores
  for (i = 0; i < 25; i++) {
  numeros[i]=rand()%1000;// limite de até 1000
