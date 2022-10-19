@@ -11,11 +11,10 @@ char nomeCompleto[100];
 int i;
 int j;
 printf("Digite seu nome:");
-scanf("%s",nome);
+scanf ( "%[^\n]", nome);
 
 printf("Digite seu sobrenome:");
-scanf("%s",sobrenome);
-
+scanf ( "%[^\n]", sobrenome);
 
 i=0;
 do{
