@@ -2,20 +2,9 @@
 #include <stdlib.h>
 
 /*
-Solicite ao usuário que digite seu nome e último sobrenome (uma variável).
-Separe a variável em duas, garantindo que a primeira letra é maiúscula e as demais são minúsculas. Exiba o resultado
+Solicite ao usuÃ¡rio que digite seu nome e Ãºltimo sobrenome (uma variÃ¡vel).
+Separe a variÃ¡vel em duas, garantindo que a primeira letra Ã© maiÃºscula e as demais sÃ£o minÃºsculas. Exiba o resultado
 */
-
-char pMaiusculo(char caracter){
-    char minusculo;
-    if(caracter >= 'a' && caracter <= 'z'){
-        minusculo = caracter - ('a'- 'A');
-        return minusculo;
-    }else{ // validação de minusculos
-        minusculo = caracter;
-        return minusculo;
-    }
-}
 
 int main()
 {
