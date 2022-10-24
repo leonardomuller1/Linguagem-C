@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 /*
-Solicite uma frase. Exiba a frase digitada, com cada palavra ocupando uma linha.
+Solicite que o usuário escreva uma frase. Exiba o número de palavras que esta frase contém.
 */
 
 int main()
