@@ -20,7 +20,10 @@ int main() {
     printf("Qual a periodo?");
     scanf("%f",&periodo);
 
-    printf("%i",sinal(&frequencia,&periodo));
+    printf("\n\nA funcao retornou %i\n\n",sinal(&frequencia,&periodo));
+
+    printf("\nA frequencia eh %f",frequencia);
+    printf("\nO periodo eh %f",periodo);
 
 }
 
@@ -30,8 +33,14 @@ int sinal(float *frequencia, float *periodo ) {
    }else if(*frequencia && *periodo){
            return -2;
    }else if(*frequencia == 0){
+        float aux = *periodo;
+        float inv = 1 / aux;
+        *frequencia = inv;
         return 0;
    }else if(*periodo == 0){
+        float aux = *frequencia;
+        float inv = 1 / aux;
+        *periodo = inv;
         return 0;
    }
 }
