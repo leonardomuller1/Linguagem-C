@@ -1,7 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/*
+Elaborar um programa em C que lê uma string de no máximo
+80 caracteres e a escreve num arquivo de nome “string.tx_” da
+seguinte forma:
+a) Toda a string;
+b) Uma linha em branco;
+c) A string invertida;
+d) Uma linha em branco;
+e) Cada palavra da string numa linha;
+f) Uma linha em branco;
+g) Cada letra da string numa linha;
+h) Uma linha em branco;
+i) Cada caracter da string e quantas vezes ele esta
+presente na string;
 
+Posteriormente, abrir o arquivo “string.tx_” e escrever o seu
+conteúdo.
+*/
 int main(void)
 {
     FILE *file;
