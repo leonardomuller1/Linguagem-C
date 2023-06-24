@@ -22,6 +22,7 @@ int main(void)
     }
     fgets(texto,sizeof(texto),file);//obtem o texto do arquivo 
 
+    while (fgets(texto, sizeof(texto), file)){
     for (int j = 0; j < strlen(texto); j++) {
             char letra = tolower(texto[j]);
             if (letra == 'a') {
@@ -36,13 +37,14 @@ int main(void)
                 u++;
             }
     }
+    }
 
      printf("A: %i\n",a);
      printf("E: %i\n",e);
      printf("I: %i\n",i);
      printf("O: %i\n",o);
      printf("U: %i\n",u);
-    fclose(file); // fecha o arquivo
+     fclose(file); // fecha o arquivo
 
     return 0;
 }
