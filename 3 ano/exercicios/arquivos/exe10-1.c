@@ -12,7 +12,7 @@ int main(void)
     strcat(arquivo, ".txt");
 
     char texto[4000];
-    int contador[26]={0};  // Array para contar as letras do alfabeto
+    int contador[26]={0},i=o;  // Array para contar as letras do alfabeto
 
     file = fopen(arquivo, "r");
     if (file == NULL)
@@ -22,7 +22,7 @@ int main(void)
     }
     
     while(fgets(texto, sizeof(texto), file)){
-        for (int i = 0; i < strlen(texto); i++)
+        for (i = 0; i < strlen(texto); i++)
         {
             char letra= texto[i];
             if (letra >= 'a' && letra <= 'z') 
