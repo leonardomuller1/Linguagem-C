@@ -180,7 +180,6 @@ void exibicaoPessoa(struct Pessoa *pessoa)
 
 void listarUsuarios()
 {
-
     int menu;
     int genero;
     char linha[500];
@@ -189,10 +188,7 @@ void listarUsuarios()
     {
         printf("Não foi possível abrir o arquivo para leitura.\n");
         fclose(arquivo);
-        return 0;
     }
-    while(1)
-    {
         printf("\nSub-menu:\n");
         printf("1. Listar Todos Os Usuarios\n");
         printf("2. Filtrar por genero masculino\n");
@@ -248,17 +244,84 @@ void listarUsuarios()
             fclose(arquivo);
             break;
         case 0:
-            return 0;
+            break;
         default:
             printf("Erro, opcao invalida");
-            return 0;
+            break;
+        }
+}
+
+float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2) {
+    int totalInteresses = 0;
+    int interessesComuns = 0;
+
+    // Hobbies
+    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica) {
+        interessesComuns++;
+    }
+    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura) {
+        interessesComuns++;
+    }
+    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes) {
+        interessesComuns = interessesComuns + 15;
+    }
+    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar) {
+        interessesComuns++;
+    }
+    totalInteresses += 18;
+
+    // Locais
+    if (pessoa1.local.viajar == pessoa2.local.viajar) {
+        interessesComuns++;
+    }
+    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa) {
+        interessesComuns++;
+    }
+    if (pessoa1.local.praia == pessoa2.local.praia) {
+        interessesComuns++;
+    }
+    totalInteresses += 3;
+
+    // Filmes
+    if (pessoa1.filmes.acao == pessoa2.filmes.acao) {
+        interessesComuns++;
+    }
+    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura) {
+        interessesComuns++;
+    }
+    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia) {
+        interessesComuns++;
+    }
+    if (pessoa1.filmes.drama == pessoa2.filmes.drama) {
+        interessesComuns++;
+    }
+    if (pessoa1.filmes.terror == pessoa2.filmes.terror) {
+        interessesComuns++;
+    }
+    if (pessoa1.filmes.trash == pessoa2.filmes.trash) {
+        interessesComuns++;
+    }
+    totalInteresses += 6;
+
+    // Calcular e retornar a porcentagem de compatibilidade
+    return (float)interessesComuns / totalInteresses * 100;
+}
+
+void compararUsuarios(struct Pessoa pessoas[], int numPessoas) {
+    for (int i = 0; i < numPessoas; i++) {
+        for (int j = i + 1; j < numPessoas; j++) {
+            float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+            printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
         }
     }
 }
+
+
 int main()
 {
     int menu;
     int numPessoas;
+    struct Pessoa *pessoas = NULL;
     while(1)
     {
         printf("\nMenu:\n");
@@ -276,7 +339,7 @@ int main()
             printf("Quantas pessoas deseja adicionar? ");
             scanf("%d", &numPessoas);
 
-            struct Pessoa *pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
+            pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
 
             if (pessoas == NULL)
             {
@@ -308,9 +371,40 @@ int main()
         case 2:
             listarUsuarios();
             break;
-        case 3:
-            listarUsuarios();
+        case 3: // Analise a compatibilidade
+            arquivo = fopen("dados.txt", "r");
+            if (arquivo == NULL) {
+                printf("Não foi possível abrir o arquivo para leitura.\n");
+                return 1;
+            }
+
+            // Conta o número de pessoas no arquivo
+            numPessoas = 0;
+            struct Pessoa pessoa;  // Estrutura temporária para ler os dados do arquivo
+            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1) {
+                numPessoas++;
+            }
+
+            // Alocar espaço para o array de pessoas
+            pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
+            if (pessoas == NULL) {
+                printf("Erro ao alocar memória.\n");
+                fclose(arquivo); // Fecha o arquivo se ocorrer erro na alocação de memória
+                return 1;
+            }
+
+            // Reinicia o arquivo e lê os dados no array de pessoas
+            rewind(arquivo);
+            int i = 0;
+            while (fread(&pessoas[i], sizeof(struct Pessoa), 1, arquivo) == 1) {
+                i++;
+            }
+            fclose(arquivo);
+
+            // Chama a função para comparar todas as pessoas
+            compararUsuarios(pessoas, numPessoas);
             break;
+
         case 0:
             return 0;
         default:
