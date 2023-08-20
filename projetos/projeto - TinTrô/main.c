@@ -73,7 +73,7 @@ int main()
         printf("\nMenu:\n");
         printf("1. Adicionar Pessoas\n");
         printf("2. Listar Pessoas\n");
-        printf("3. Analise a compatibilidade\n");
+        printf("3. Analise de compatibilidade\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
 
@@ -81,14 +81,14 @@ int main()
 
         switch (menu)
         {
-        case 1: // Adicionar Pessoa
+        case 1:
             adicionarPessoa();
             break;
 
-        case 2: // Listar Pessoa
+        case 2:
             listarPessoas();
             break;
-        case 3: // Analise a compatibilidade
+        case 3:
             compararPessoas();
             break;
         case 0:
@@ -289,7 +289,7 @@ void listarPessoas()
         fclose(arquivo);
     }
     printf("\nSub-menu:\n");
-    printf("1. Listar todos os Pessoas\n");
+    printf("1. Listar todos as pessoas\n");
     printf("2. Filtrar por genero masculino\n");
     printf("3. Filtrar por genero feminino\n");
     printf("4. Filtrar por genero outros\n");
@@ -463,8 +463,6 @@ void compararPessoas()
     fclose(arquivo);
 
     int submenu;
-    while (1)
-    {
         printf("\nSubmenu - Analise a compatibilidade:\n");
         printf("1. Comparar todos as pessoas\n");
         printf("2. Exibir compatibilidade de pessoa especifica\n");
@@ -486,42 +484,42 @@ void compararPessoas()
                 }
             }
             break;
-case 2:
-    printf("Digite o nome da pessoa para comparar: ");
-    char nomePessoaComparar[100];
-    getchar();  // Limpar o caractere de nova linha pendente no buffer
-    fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
-    nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
+        case 2:
+            printf("Digite o nome da pessoa para comparar: ");
+            char nomePessoaComparar[100];
+            getchar();  // Limpar o caractere de nova linha pendente no buffer
+            fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
+            nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
 
-    struct Pessoa pessoaComparar;
-    int encontrouPessoaComparar = 0;
+            struct Pessoa pessoaComparar;
+            int encontrouPessoaComparar = 0;
 
-    for (int i = 0; i < numPessoas; i++)
-    {
-        if (strcmp(pessoas[i].nome, nomePessoaComparar) == 0)
-        {
-            pessoaComparar = pessoas[i];
-            encontrouPessoaComparar = 1;
-            break;
-        }
-    }
-
-    if (encontrouPessoaComparar)
-    {
-        for (int i = 0; i < numPessoas; i++)
-        {
-            if (strcmp(pessoas[i].nome, pessoaComparar.nome) != 0)
+            for (int i = 0; i < numPessoas; i++)
             {
-                float compatibilidade = analiseCompatibilidade(pessoaComparar, pessoas[i]);
-                printf("Compatibilidade entre %s e %s: %.2f%%\n",pessoaComparar.nome, pessoas[i].nome, compatibilidade);
+                if (strcmp(pessoas[i].nome, nomePessoaComparar) == 0)
+                {
+                    pessoaComparar = pessoas[i];
+                    encontrouPessoaComparar = 1;
+                    break;
+                }
             }
-        }
-    }
-    else
-    {
-        printf("A pessoa especificada para comparar não foi encontrada.\n");
-    }
-    break;
+
+            if (encontrouPessoaComparar)
+            {
+                for (int i = 0; i < numPessoas; i++)
+                {
+                    if (strcmp(pessoas[i].nome, pessoaComparar.nome) != 0)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoaComparar, pessoas[i]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n",pessoaComparar.nome, pessoas[i].nome, compatibilidade);
+                    }
+                }
+            }
+            else
+            {
+                printf("A pessoa especificada para comparar não foi encontrada.\n");
+            }
+            break;
 
 
         case 3:
@@ -579,76 +577,99 @@ case 2:
             break;
         }
     }
-}
 
-float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2)
-{
+
+float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2) {
     int totalInteresses = 0;
     int interessesComuns = 0;
 
     // Hobbies
-    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica)
-    {
-        interessesComuns++;
+    int interessesHobbies = 0;
+    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica) {
+        interessesHobbies++;
     }
-    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura)
-    {
-        interessesComuns++;
+    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura) {
+        interessesHobbies++;
     }
-    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes)
-    {
-        interessesComuns++;
+    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes) {
+        interessesHobbies++;
     }
-    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar)
-    {
-        interessesComuns++;
+    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar) {
+        interessesHobbies++;
     }
-    totalInteresses += 4;
+
+    if (interessesHobbies == 4) {
+        interessesComuns += 32;
+    } else if (interessesHobbies == 3) {
+        interessesComuns += 16;
+    }else if (interessesHobbies == 2) {
+        interessesComuns += 8;
+    } else if (interessesHobbies == 1) {
+        interessesComuns += 4;
+    }
+    totalInteresses += 32;
 
     // Locais
-    if (pessoa1.local.viajar == pessoa2.local.viajar)
-    {
-        interessesComuns++;
+    int interessesLocais = 0;
+    if (pessoa1.local.viajar == pessoa2.local.viajar) {
+        interessesLocais++;
     }
-    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa)
-    {
-        interessesComuns++;
+    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa) {
+        interessesLocais++;
     }
-    if (pessoa1.local.praia == pessoa2.local.praia)
-    {
-        interessesComuns++;
+    if (pessoa1.local.praia == pessoa2.local.praia) {
+        interessesLocais++;
     }
-    totalInteresses += 3;
+
+    if (interessesLocais == 3) {
+        interessesComuns += 32;
+    } else if (interessesLocais == 2) {
+        interessesComuns += 16;
+    }else if (interessesLocais == 1) {
+        interessesComuns += 8;
+    }
+    totalInteresses += 32;
 
     // Filmes
-    if (pessoa1.filmes.acao == pessoa2.filmes.acao)
-    {
-        interessesComuns++;
+    int interessesFilmes = 0;
+    if (pessoa1.filmes.acao == pessoa2.filmes.acao) {
+        interessesFilmes++;
     }
-    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura)
-    {
-        interessesComuns++;
+    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura) {
+        interessesFilmes++;
     }
-    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia)
-    {
-        interessesComuns++;
+    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia) {
+        interessesFilmes++;
     }
-    if (pessoa1.filmes.drama == pessoa2.filmes.drama)
-    {
-        interessesComuns++;
+    if (pessoa1.filmes.drama == pessoa2.filmes.drama) {
+        interessesFilmes++;
     }
-    if (pessoa1.filmes.terror == pessoa2.filmes.terror)
-    {
-        interessesComuns++;
+    if (pessoa1.filmes.terror == pessoa2.filmes.terror) {
+        interessesFilmes++;
     }
-    if (pessoa1.filmes.trash == pessoa2.filmes.trash)
-    {
-        interessesComuns++;
+    if (pessoa1.filmes.trash == pessoa2.filmes.trash) {
+        interessesFilmes++;
     }
-    totalInteresses += 6;
 
+    if (interessesFilmes  == 6) {
+        interessesComuns += 32;
+    } else if (interessesFilmes == 5) {
+        interessesComuns += 16;
+    } else if (interessesFilmes == 4) {
+        interessesComuns += 8;
+    }else if (interessesFilmes == 3) {
+        interessesComuns += 4;
+    }else if (interessesFilmes == 2) {
+        interessesComuns += 2;
+    }else if (interessesFilmes == 1) {
+        interessesComuns += 1;
+    }
+    totalInteresses += 32;
+
+    // Calcular a porcentagem de interesses comuns
     return (float)interessesComuns / totalInteresses * 100;
 }
+
 
 /*--------ASCII ART--------*/
 void asciiArtInicio()
