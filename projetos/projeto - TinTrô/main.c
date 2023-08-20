@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <time.h>
+#include <locale.h>
+/*Structs*/
 struct Hobbies
 {
     int musica;
@@ -30,7 +32,9 @@ struct Filmes
 struct Pessoa
 {
     char nome[100];
-    int idade;
+    int diaNascimento;
+    int mesNascimento;
+    int anoNascimento;
     char cidade[100];
     char genero[20];
     char fone[20];
@@ -39,54 +43,96 @@ struct Pessoa
     struct Filmes filmes;
 };
 
-int obterOpcao()
+/*Variaveis Globais*/
+int numPessoas;
+struct Pessoa *pessoas = NULL;
+FILE *arquivo;
+
+/* Protótipos de Funções */
+void adicionarPessoa();
+void preencherDados(struct Pessoa *pessoa);
+int ValidacaoIdade(int opcao);
+void ValidacaoGenero(char *genero);
+int obterOpcao();
+void listarPessoas();
+void exibicaoPessoa(struct Pessoa *pessoa);
+const char *opcaoString(int opcao);
+int calcularIdade(int diaNascimento, int mesNascimento, int anoNascimento) ;
+void compararPessoas();
+float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2);
+void exibirCompatibilidadeEspecifica(struct Pessoa pessoa);
+void asciiArtInicio();
+void asciiArtFinal();
+
+int main()
 {
-    int opcao;
-    while (1)
+    setlocale(LC_ALL, "Portuguese");
+    asciiArtInicio();
+    int menu;
+    while(1)
     {
-        scanf("%d", &opcao);
-        if (opcao == 0 || opcao == 1){
+        printf("\nMenu:\n");
+        printf("1. Adicionar Pessoas\n");
+        printf("2. Listar Pessoas\n");
+        printf("3. Analise a compatibilidade\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+
+        scanf("%d", &menu);
+
+        switch (menu)
+        {
+        case 1: // Adicionar Pessoa
+            adicionarPessoa();
             break;
-        }else{
-            printf("Opcao invalida. Digite 0 ou 1: ");
+
+        case 2: // Listar Pessoa
+            listarPessoas();
+            break;
+        case 3: // Analise a compatibilidade
+            compararPessoas();
+            break;
+        case 0:
+            asciiArtFinal();
+            return 0;
+        default:
+            printf("Erro, opcao invalida");
+            return 0;
         }
     }
-    return opcao;
 }
 
-int ValidacaoIdade()
+/*--------FORMULARIO--------*/
+void adicionarPessoa()
 {
-    int idade;
-    while (1)
+    printf("Quantas pessoas deseja adicionar? ");
+    scanf("%d", &numPessoas);
+
+    pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
+    if (pessoas == NULL)
     {
-        scanf("%d", &idade);
-        if (idade > 0 && idade < 150){
-            break;
-        }else{
-            printf("Idade invalida. Digite novamente: ");
-        }
+        printf("Erro ao alocar memória.\n");
+        return;
     }
-    return idade;
-}
 
-void ValidacaoGenero(char *genero)
-{
-    while (1)
+    for (int i = 0; i < numPessoas; i++)
     {
-        scanf(" %c", genero);
+        preencherDados(&pessoas[i]);
+    }
 
-        if (*genero == 'M'){
-            strcpy(genero, "Masculino");
-            break;
-        }else if (*genero == 'F'){
-            strcpy(genero, "Feminino");
-            break;
-        }else if (*genero == 'O'){
-            strcpy(genero, "Outros");
-            break;
-        }else{
-            printf("Genero invalido. Digite novamente: ");
+    arquivo = fopen("dados.txt", "a");
+    if (arquivo != NULL)
+    {
+        for (int i = 0; i < numPessoas; i++)
+        {
+            fwrite(&pessoas[i], sizeof(struct Pessoa), 1, arquivo);
         }
+        fclose(arquivo);
+        printf("\nDados adicionados com sucesso ao arquivo 'dados.txt'.\n");
+    }
+    else
+    {
+        printf("\nNao foi possivel abrir o arquivo para salvar os dados.\n");
     }
 }
 
@@ -97,8 +143,14 @@ void preencherDados(struct Pessoa *pessoa)
     fgets(pessoa->nome, sizeof(pessoa->nome), stdin);
     pessoa->nome[strcspn(pessoa->nome, "\n")] = '\0';
 
-    printf("Idade: ");
-    pessoa->idade = ValidacaoIdade();
+    printf("Idade: Dia: ");
+    pessoa->diaNascimento = ValidacaoIdade(1);
+
+    printf("Idade: Mes: ");
+    pessoa->mesNascimento = ValidacaoIdade(2);
+
+    printf("Idade: Ano: ");
+    pessoa->anoNascimento = ValidacaoIdade(3);
 
     printf("Cidade: ");
     getchar();
@@ -146,15 +198,196 @@ void preencherDados(struct Pessoa *pessoa)
     pessoa->filmes.trash = obterOpcao();
 }
 
-const char *opcaoString(int opcao)
+//VALIDACOES
+// VERIFICA A IDADE SE É VERDADEIRA
+int ValidacaoIdade(int opcao)
 {
-    return opcao == 1 ? "Sim" : "Nao";
+    int data;
+    while (1)
+    {
+        scanf("%d", &data);
+        if(opcao == 1 && (data > 0 && data<=31 ))
+        {
+            break;
+        }
+        else if(opcao == 2 && (data > 0 && data<=12))
+        {
+            break;
+        }
+        else if(opcao == 3 && (data > 1900 && data<=2050))
+        {
+            break;
+        }
+        else
+        {
+            printf("Opcao invalida.Digite um valor valido: ");
+        }
+    }
+    return data;
+}
+
+// VALIDA SE ESTA CORRETO O GENERO
+void ValidacaoGenero(char *genero)
+{
+    while (1)
+    {
+        scanf(" %c", genero);
+
+        if (*genero == 'M' || *genero == 'm')
+        {
+            strcpy(genero, "Masculino");
+            break;
+        }
+        else if (*genero == 'F' || *genero == 'f')
+        {
+            strcpy(genero, "Feminino");
+            break;
+        }
+        else if (*genero == 'O' || *genero == 'o')
+        {
+            strcpy(genero, "Outros");
+            break;
+        }
+        else
+        {
+            printf("Genero invalido. Digite novamente: ");
+        }
+    }
+}
+
+// VERIFICA SE É 0 OU 1
+int obterOpcao()
+{
+    int opcao;
+    while (1)
+    {
+        scanf("%d", &opcao);
+        if (opcao == 0 || opcao == 1)
+        {
+            break;
+        }
+        else
+        {
+            printf("Opcao invalida. Digite 0 ou 1: ");
+        }
+    }
+    return opcao;
+}
+
+/*--------LISTAGEM PESSOAS--------*/
+
+void listarPessoas()
+{
+    int menu;
+    int genero;
+    int idade;
+    char nome[500];
+    char linha[500];
+    FILE *arquivo = fopen("dados.txt", "r");
+    if (arquivo == NULL)
+    {
+        printf("Não foi possível abrir o arquivo para leitura.\n");
+        fclose(arquivo);
+    }
+    printf("\nSub-menu:\n");
+    printf("1. Listar todos os Pessoas\n");
+    printf("2. Filtrar por genero masculino\n");
+    printf("3. Filtrar por genero feminino\n");
+    printf("4. Filtrar por genero outros\n");
+    printf("5. Filtrar por pessoa especifica\n");
+    printf("6. Filtrar por idade\n");
+    printf("0. Sair\n");
+    printf("Escolha uma opcao: ");
+
+    scanf("%d", &menu);
+
+    switch (menu)
+    {
+    case 1: // Listar Todos as Pessoas
+        printf("Listando todos as pessoas:\n");
+        struct Pessoa pessoa;
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            exibicaoPessoa(&pessoa);
+        }
+        fclose(arquivo);
+        break;
+    case 2: // Filtro por genero masculino
+        printf("\nFiltrando por genero Masculino:\n");
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            if (strcmp(pessoa.genero, "Masculino") == 0)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+    case 3:
+        printf("\nFiltrando por genero Feminino:\n");
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            if (strcmp(pessoa.genero, "Feminino") == 0)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+    case 4:
+        printf("\nFiltrando por genero Outros:\n");
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            if (strcmp(pessoa.genero, "Outros") == 0)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+    case 5:
+        printf("\nFiltrando por pessoa especifica:\n");
+        printf("Nome: ");
+        scanf("%s",nome);
+        printf("\n");
+
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            if (strcmp(pessoa.nome, nome) == 0)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+    case 6:
+        printf("\nFiltrando por idade:\n");
+        printf("Idade: ");
+        scanf("%d", &idade);
+        printf("\n");
+
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            if (calcularIdade(pessoa.diaNascimento, pessoa.mesNascimento, pessoa.anoNascimento) == idade)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+    case 0:
+        break;
+    default:
+        printf("Erro, opcao invalida");
+        break;
+    }
 }
 
 void exibicaoPessoa(struct Pessoa *pessoa)
 {
     printf("Nome: %s\n", pessoa->nome);
-    printf("Idade: %d\n", pessoa->idade);
+
+    printf("Idade: %d\n", calcularIdade(pessoa->diaNascimento,pessoa->mesNascimento,pessoa->anoNascimento));
     printf("Cidade: %s\n", pessoa->cidade);
     printf("Genero: %s\n", pessoa->genero);
 
@@ -178,238 +411,299 @@ void exibicaoPessoa(struct Pessoa *pessoa)
     printf("Trash: %s\n\n\n", opcaoString(pessoa->filmes.trash));
 }
 
-void listarUsuarios()
+const char *opcaoString(int opcao)
 {
-    int menu;
-    int genero;
-    char linha[500];
-    FILE *arquivo = fopen("dados.txt", "r");
-    if (arquivo == NULL)
-    {
-        printf("Não foi possível abrir o arquivo para leitura.\n");
-        fclose(arquivo);
-    }
-        printf("\nSub-menu:\n");
-        printf("1. Listar Todos Os Usuarios\n");
-        printf("2. Filtrar por genero masculino\n");
-        printf("3. Filtrar por genero feminino\n");
-        printf("4. Filtrar por genero outros\n");
-        printf("0. Sair\n");
-        printf("Escolha uma opcao: ");
-
-        scanf("%d", &menu);
-
-        switch (menu)
-        {
-        case 1: // Listar Todos Os Usuarios
-            printf("Listando todos os usuarios:\n");
-            struct Pessoa pessoa;
-            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
-            {
-                exibicaoPessoa(&pessoa);
-            }
-            fclose(arquivo);
-            break;
-        case 2: // Filtro por genero masculino
-            printf("\nFiltrando por genero Masculino:\n");
-            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
-            {
-                if (strcmp(pessoa.genero, "Masculino") == 0)
-                {
-                    exibicaoPessoa(&pessoa);
-                }
-            }
-            fclose(arquivo);
-            break;
-        case 3:
-            printf("\nFiltrando por genero Feminino:\n");
-            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
-            {
-                if (strcmp(pessoa.genero, "Feminino") == 0)
-                {
-                    exibicaoPessoa(&pessoa);
-                }
-            }
-            fclose(arquivo);
-            break;
-        case 4:
-            printf("\nFiltrando por genero Outros:\n");
-            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
-            {
-                if (strcmp(pessoa.genero, "Outros") == 0)
-                {
-                    exibicaoPessoa(&pessoa);
-                }
-            }
-            fclose(arquivo);
-            break;
-        case 0:
-            break;
-        default:
-            printf("Erro, opcao invalida");
-            break;
-        }
+    return opcao == 1 ? "Sim" : "Nao";
 }
 
-float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2) {
+int calcularIdade(int diaNascimento, int mesNascimento, int anoNascimento)
+{
+    time_t t = time(NULL);
+    struct tm tempo = *localtime(&t);
+
+    int idade = tempo.tm_year + 1900 - anoNascimento;
+    if (mesNascimento > tempo.tm_mon + 1 ||
+            (mesNascimento == tempo.tm_mon + 1 && diaNascimento > tempo.tm_mday))
+    {
+        idade--;
+    }
+
+    return idade;
+}
+
+/*--------COMPATIBILIDADE--------*/
+
+void compararPessoas()
+{
+    arquivo = fopen("dados.txt", "r");
+    if (arquivo == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo para leitura.\n");
+        return 1;
+    }
+    numPessoas = 0;
+    struct Pessoa pessoa; 
+    while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+    {
+        numPessoas++;
+    }
+    pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
+    if (pessoas == NULL)
+    {
+        printf("Erro ao alocar memória.\n");
+        fclose(arquivo); 
+        return 1;
+    }
+
+    rewind(arquivo);
+    int i = 0;
+    while (fread(&pessoas[i], sizeof(struct Pessoa), 1, arquivo) == 1)
+    {
+        i++;
+    }
+    fclose(arquivo);
+
+    int submenu;
+    while (1) 
+    {
+        printf("\nSubmenu - Analise a compatibilidade:\n");
+        printf("1. Comparar todos as pessoas\n");
+        printf("2. Exibir compatibilidade de pessoa especifica\n");
+        printf("3. Exibir compatibilidade entre duas pessoas especificas\n");
+        printf("0. Voltar ao menu principal\n");
+        printf("Escolha uma opcao: ");
+
+        scanf("%d", &submenu);
+
+        switch (submenu)
+        {
+        case 1:
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                    printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                }
+            }
+            break;
+        case 2:
+
+        case 3:
+            getchar();
+            printf("Digite o nome da primeira pessoa: ");
+            char nomePessoa1[100];
+            fgets(nomePessoa1, sizeof(nomePessoa1), stdin);
+            nomePessoa1[strcspn(nomePessoa1, "\n")] = '\0';
+
+            printf("Digite o nome da segunda pessoa: ");
+            char nomePessoa2[100];
+            fgets(nomePessoa2, sizeof(nomePessoa2), stdin);
+            nomePessoa2[strcspn(nomePessoa2, "\n")] = '\0';
+
+            struct Pessoa pessoa1, pessoa2;
+            int encontrouPessoa1 = 0, encontrouPessoa2 = 0;
+
+            for (int i = 0; i < numPessoas; i++)
+            {
+                if (strcmp(pessoas[i].nome, nomePessoa1) == 0)
+                {
+                    pessoa1 = pessoas[i];
+                    encontrouPessoa1 = 1;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < numPessoas; i++)
+            {
+                if (strcmp(pessoas[i].nome, nomePessoa2) == 0)
+                {
+                    pessoa2 = pessoas[i];
+                    encontrouPessoa2 = 1;
+                    break;
+                }
+            }
+
+            if (encontrouPessoa1 && encontrouPessoa2)
+            {
+                float compatibilidade = analiseCompatibilidade(pessoa1, pessoa2);
+                printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoa1.nome, pessoa2.nome, compatibilidade);
+            }
+            else
+            {
+                printf("Uma das pessoas especificadas não foi encontrada.\n");
+            }
+            break;
+
+        case 0:
+            printf("Voltando ao menu principal.\n");
+            return;
+
+        default:
+            printf("Opcao invalida.\n");
+            break;
+        }
+    }
+}
+
+float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2)
+{
     int totalInteresses = 0;
     int interessesComuns = 0;
 
     // Hobbies
-    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica) {
+    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica)
+    {
         interessesComuns++;
     }
-    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura) {
+    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura)
+    {
         interessesComuns++;
     }
-    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes) {
-        interessesComuns = interessesComuns + 15;
-    }
-    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar) {
+    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes)
+    {
         interessesComuns++;
     }
-    totalInteresses += 18;
+    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar)
+    {
+        interessesComuns++;
+    }
+    totalInteresses += 4;
 
     // Locais
-    if (pessoa1.local.viajar == pessoa2.local.viajar) {
+    if (pessoa1.local.viajar == pessoa2.local.viajar)
+    {
         interessesComuns++;
     }
-    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa) {
+    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa)
+    {
         interessesComuns++;
     }
-    if (pessoa1.local.praia == pessoa2.local.praia) {
+    if (pessoa1.local.praia == pessoa2.local.praia)
+    {
         interessesComuns++;
     }
     totalInteresses += 3;
 
     // Filmes
-    if (pessoa1.filmes.acao == pessoa2.filmes.acao) {
+    if (pessoa1.filmes.acao == pessoa2.filmes.acao)
+    {
         interessesComuns++;
     }
-    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura) {
+    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura)
+    {
         interessesComuns++;
     }
-    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia) {
+    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia)
+    {
         interessesComuns++;
     }
-    if (pessoa1.filmes.drama == pessoa2.filmes.drama) {
+    if (pessoa1.filmes.drama == pessoa2.filmes.drama)
+    {
         interessesComuns++;
     }
-    if (pessoa1.filmes.terror == pessoa2.filmes.terror) {
+    if (pessoa1.filmes.terror == pessoa2.filmes.terror)
+    {
         interessesComuns++;
     }
-    if (pessoa1.filmes.trash == pessoa2.filmes.trash) {
+    if (pessoa1.filmes.trash == pessoa2.filmes.trash)
+    {
         interessesComuns++;
     }
     totalInteresses += 6;
 
-    // Calcular e retornar a porcentagem de compatibilidade
     return (float)interessesComuns / totalInteresses * 100;
 }
 
-void compararUsuarios(struct Pessoa pessoas[], int numPessoas) {
-    for (int i = 0; i < numPessoas; i++) {
-        for (int j = i + 1; j < numPessoas; j++) {
-            float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
-            printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+
+void exibirCompatibilidadeEspecifica(struct Pessoa pessoa)
+{
+    arquivo = fopen("dados.txt", "r");
+    if (arquivo == NULL)
+    {
+        printf("Nao foi possivel abrir o arquivo para leitura.\n");
+        return;
+    }
+
+    struct Pessoa outraPessoa;
+
+    while (fread(&outraPessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+    {
+        if (strcmp(pessoa.nome, outraPessoa.nome) != 0)
+        {
+            float compatibilidade = analiseCompatibilidade(pessoa, outraPessoa);
+            printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoa.nome, outraPessoa.nome, compatibilidade);
         }
     }
+
+    fclose(arquivo);
 }
 
-
-int main()
+/*--------ASCII ART--------*/
+void asciiArtInicio()
 {
-    int menu;
-    int numPessoas;
-    struct Pessoa *pessoas = NULL;
-    while(1)
-    {
-        printf("\nMenu:\n");
-        printf("1. Adicionar Usuarios\n");
-        printf("2. Listar Usuarios\n");
-        printf("3. Analise a compatibilidade\n");
-        printf("0. Sair\n");
-        printf("Escolha uma opcao: ");
+    printf(" /$$$$$$$$ /$$$$$$ /$$   /$$ /$$$$$$$$ /$$$$$$$   /$$$$$$ \n");
+    printf("|__  $$__/|_  $$_/| $$$ | $$|__  $$__/| $$__  $$ /$$__  $$\n");
+    printf("   | $$     | $$  | $$$$| $$   | $$   | $$  \\ $$| $$  \\ $$\n");
+    printf("   | $$     | $$  | $$ $$ $$   | $$   | $$$$$$$/| $$  | $$\n");
+    printf("   | $$     | $$  | $$  $$$$   | $$   | $$__  $$| $$  | $$\n");
+    printf("   | $$     | $$  | $$\\  $$$   | $$   | $$  \\ $$| $$  | $$\n");
+    printf("   | $$    /$$$$$$| $$ \\  $$   | $$   | $$  | $$|  $$$$$$/\n");
+    printf("   |__/   |______/|__/  \\__/   |__/   |__/  |__/ \\______/ \n");
+    printf("                                                          \n");
+    printf("                                                          \n");
+    printf("      ");
+}
 
-        scanf("%d", &menu);
-
-        switch (menu)
-        {
-        case 1:
-            printf("Quantas pessoas deseja adicionar? ");
-            scanf("%d", &numPessoas);
-
-            pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
-
-            if (pessoas == NULL)
-            {
-                printf("Erro ao abrir o arquivo.\n");
-                return 1;
-            }
-
-            for (int i = 0; i < numPessoas; i++)
-            {
-                preencherDados(&pessoas[i]);
-            }
-
-            FILE *arquivo = fopen("dados.txt", "a");
-            if (arquivo != NULL)
-            {
-                for (int i = 0; i < numPessoas; i++)
-                {
-                    fwrite(&pessoas[i], sizeof(struct Pessoa), 1, arquivo);
-                }
-                fclose(arquivo);
-                printf("\nDados adicionados com sucesso ao arquivo 'dados.txt'.\n");
-            }
-            else
-            {
-                printf("\nNao foi possivel abrir o arquivo para salvar os dados.\n");
-            }
-            break;
-
-        case 2:
-            listarUsuarios();
-            break;
-        case 3: // Analise a compatibilidade
-            arquivo = fopen("dados.txt", "r");
-            if (arquivo == NULL) {
-                printf("Não foi possível abrir o arquivo para leitura.\n");
-                return 1;
-            }
-
-            // Conta o número de pessoas no arquivo
-            numPessoas = 0;
-            struct Pessoa pessoa;  // Estrutura temporária para ler os dados do arquivo
-            while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1) {
-                numPessoas++;
-            }
-
-            // Alocar espaço para o array de pessoas
-            pessoas = (struct Pessoa *)malloc(numPessoas * sizeof(struct Pessoa));
-            if (pessoas == NULL) {
-                printf("Erro ao alocar memória.\n");
-                fclose(arquivo); // Fecha o arquivo se ocorrer erro na alocação de memória
-                return 1;
-            }
-
-            // Reinicia o arquivo e lê os dados no array de pessoas
-            rewind(arquivo);
-            int i = 0;
-            while (fread(&pessoas[i], sizeof(struct Pessoa), 1, arquivo) == 1) {
-                i++;
-            }
-            fclose(arquivo);
-
-            // Chama a função para comparar todas as pessoas
-            compararUsuarios(pessoas, numPessoas);
-            break;
-
-        case 0:
-            return 0;
-        default:
-            printf("Erro, opcao invalida");
-            return 0;
-        }
-    }
+void asciiArtFinal()
+{
+    printf("               _,.---\"\"'\"''\"'\"\"`\"\"''`--..__\n");
+    printf("            _.-'                                `-._\n");
+    printf("          ,\"                                        `-._\n");
+    printf("        ,'                                              `._\n");
+    printf("      .'                                                   `-._\n");
+    printf("    ,'         _                                               \".\n");
+    printf("   /       . \"                                                   `.\n");
+    printf("  /    . '      _ .                                                `.\n");
+    printf(" .   .      . '                                                      `.\n");
+    printf(" ' .'   . '            __   ,. . ..__                                  `.\n");
+    printf("j .   .  .      _. --\" ___.......__ ` -._                               `\n");
+    printf("|'  .' .'     .' _,.-\"\"'            `\"--._ `-._                           \\\n");
+    printf(":  .  .   . .' ,'                         `\"._ `                           \\\n");
+    printf("| .  /   . , .'                               `._`.                         \\\n");
+    printf("|   .   ' . /                                    `. .                        .\n");
+    printf(".      ' / /                                       `. .                       .\n");
+    printf("|  '  . ' /;                                         . `. .                   |\n");
+    printf("'  |  | |j ,                                          `. ` `.                 :\n");
+    printf(" . '  | |:'  _.,..,._              _..,-.,.._         , \\  ` `                |\n");
+    printf(" 'j   | |,  ._,.:,:;..\".         .:\".;..;.:. `,      . ,',\\   .`.              |\n");
+    printf("  |   ' . ,'             `                   `\".     . : .   \\ `             '\n");
+    printf("  '   . |'    _.....__    .        _....._      `.     ^. ,\\   . '\n");
+    printf("   .    |     _,.--.._`.            _.--._`.     .     , .`.   \\ \\        /\n");
+    printf("   |   j     \"..(_)___`.  '       .\"_(_)__`-.           ` : :.   . \\      /\n");
+    printf("   '   :|                                               ,\" ; | __| `.    /\n");
+    printf("    \\  ||              . '        ` .                    .' .\"'   `.|   .\n");
+    printf("     \\.'|            ,' .             .                 , .'  ,`\"| |'  /\n");
+    printf("      , .          '   /                .               . | .'   | |  /\n");
+    printf("     . ,|        '   .'         '\".                  . ; \"| |.   | | /\n");
+    printf("     '. '           :              .`            . ' . ` '| | `  | '.\n");
+    printf("    , ' .`          `.._     _..__.' `        \" , \". ,  : '  `._.'.'\n");
+    printf("     ; \"  ,'        .' ,`---' ; '.`.         , : ' ,  \"  '. \" ; ./\n");
+    printf("      , '.  .      '. ': , \" .', :. ,`.     : .  \"  ; . `, ` . ,/\n");
+    printf("      . ,  ; .   \". ;.-\"\"`-:.--'\"\"-._'.      . '  :  ' . .' \" ^.\n");
+    printf("       . ` . '  ',.'                 `\".   ` ,  \"  . `, . .,'.,'\n");
+    printf("     '  , . : .   :-----==========-----:   '. ^  ;  `. : ^ , '/\n");
+    printf("      ;  .`  ,   ,`.                 _.'   ` . ' . \"  . ,` . ,\n");
+    printf("    .  ,  ,'. ` ' , `\"-...-----...--' \" '. , ' \" . , ' . '. /\n");
+    printf("      . \"  . , ; . \" ` . ,` '. \" . \". ^ ` .  .  ' `  . :' ;/\n");
+    printf("     ' ` . ' , ` ; `  ' :  ` ' , : , . ,  ` .  `  . ^.          `\"-_\n");
+    printf("       ' , : . '  `. '. , ^ . \" . . \" .  ` . , ^  ,  .'      `\".._\n");
+    printf("        _.  ` :  ^  \" .   .  '  ,  , ' \" ,  ` .  `  . ^.          `\"-..\n");
+    printf("    _.-\"  ; .  . ' ',  ' \"  ` `: .`  ,' . ' \"  , ' . , \\`.              `-_");
+    printf("_.-\"     '  ` ; , , . . `  ' ;  . , . ^   . ^ :  . '  . \\ \\\\`.               \"._\n");
+    printf("         ` . , \" .  `  .` \" . .  ` . , : ^  '   '  ; , ' \\ . `.\n");
+    printf("            ' , ' .   .  \" , .                           |     \\.  \\\n");
+    printf("             `\"'. ` :,`, \" '   '                          |     `-. \\\n");
+    printf("              `..  . `  '   `                           |        ` \\\n");
+    printf("              .  .  `.   .                              |          `.     mh\n");
 }
