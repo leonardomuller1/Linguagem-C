@@ -60,7 +60,6 @@ const char *opcaoString(int opcao);
 int calcularIdade(int diaNascimento, int mesNascimento, int anoNascimento) ;
 void compararPessoas();
 float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2);
-void exibirCompatibilidadeEspecifica(struct Pessoa pessoa);
 void asciiArtInicio();
 void asciiArtFinal();
 
@@ -442,7 +441,7 @@ void compararPessoas()
         return 1;
     }
     numPessoas = 0;
-    struct Pessoa pessoa; 
+    struct Pessoa pessoa;
     while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
     {
         numPessoas++;
@@ -451,7 +450,7 @@ void compararPessoas()
     if (pessoas == NULL)
     {
         printf("Erro ao alocar memória.\n");
-        fclose(arquivo); 
+        fclose(arquivo);
         return 1;
     }
 
@@ -464,7 +463,7 @@ void compararPessoas()
     fclose(arquivo);
 
     int submenu;
-    while (1) 
+    while (1)
     {
         printf("\nSubmenu - Analise a compatibilidade:\n");
         printf("1. Comparar todos as pessoas\n");
@@ -487,7 +486,43 @@ void compararPessoas()
                 }
             }
             break;
-        case 2:
+case 2:
+    printf("Digite o nome da pessoa para comparar: ");
+    char nomePessoaComparar[100];
+    getchar();  // Limpar o caractere de nova linha pendente no buffer
+    fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
+    nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
+
+    struct Pessoa pessoaComparar;
+    int encontrouPessoaComparar = 0;
+
+    for (int i = 0; i < numPessoas; i++)
+    {
+        if (strcmp(pessoas[i].nome, nomePessoaComparar) == 0)
+        {
+            pessoaComparar = pessoas[i];
+            encontrouPessoaComparar = 1;
+            break;
+        }
+    }
+
+    if (encontrouPessoaComparar)
+    {
+        for (int i = 0; i < numPessoas; i++)
+        {
+            if (strcmp(pessoas[i].nome, pessoaComparar.nome) != 0)
+            {
+                float compatibilidade = analiseCompatibilidade(pessoaComparar, pessoas[i]);
+                printf("Compatibilidade entre %s e %s: %.2f%%\n",pessoaComparar.nome, pessoas[i].nome, compatibilidade);
+            }
+        }
+    }
+    else
+    {
+        printf("A pessoa especificada para comparar não foi encontrada.\n");
+    }
+    break;
+
 
         case 3:
             getchar();
@@ -613,30 +648,6 @@ float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2)
     totalInteresses += 6;
 
     return (float)interessesComuns / totalInteresses * 100;
-}
-
-
-void exibirCompatibilidadeEspecifica(struct Pessoa pessoa)
-{
-    arquivo = fopen("dados.txt", "r");
-    if (arquivo == NULL)
-    {
-        printf("Nao foi possivel abrir o arquivo para leitura.\n");
-        return;
-    }
-
-    struct Pessoa outraPessoa;
-
-    while (fread(&outraPessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
-    {
-        if (strcmp(pessoa.nome, outraPessoa.nome) != 0)
-        {
-            float compatibilidade = analiseCompatibilidade(pessoa, outraPessoa);
-            printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoa.nome, outraPessoa.nome, compatibilidade);
-        }
-    }
-
-    fclose(arquivo);
 }
 
 /*--------ASCII ART--------*/
