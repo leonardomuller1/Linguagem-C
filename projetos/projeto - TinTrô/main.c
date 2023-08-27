@@ -587,9 +587,9 @@ void compararPessoas()
     printf("1. Comparar todos as pessoas\n");
     printf("2. Exibir compatibilidade de pessoa especifica\n");
     printf("3. Exibir compatibilidade entre duas pessoas especificas\n");
-    printf("3. Exibir entre duas idades\n");
-    printf("3. Exibir compatibilidade entre genero especifico\n");
-    printf("3. Exibir compatibilidade entre hobbies especifico\n");
+    printf("4. Exibir entre duas idades\n");
+    printf("5. Exibir compatibilidade entre genero especifico\n");
+    printf("6. Exibir compatibilidade entre hobbies especifico\n");
     printf("0. Voltar ao menu principal\n");
     printf("Escolha uma opcao: ");
 
