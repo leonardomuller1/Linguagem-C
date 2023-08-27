@@ -377,7 +377,7 @@ void listarPessoas()
         }
         fclose(arquivo);
         break;
-     case 7: // Filtro por hobby
+    case 7: // Filtro por hobby
         printf("\nFiltrando por hobby:\n");
         int hobbyFiltro;
         printf("Escolha um hobby:\n");
@@ -552,6 +552,8 @@ int calcularIdade(int diaNascimento, int mesNascimento, int anoNascimento)
 
 void compararPessoas()
 {
+    int idadeMinima, idadeMaxima;
+    char generoDesejado[20];
     arquivo = fopen("dados.txt", "r");
     if (arquivo == NULL)
     {
@@ -581,205 +583,305 @@ void compararPessoas()
     fclose(arquivo);
 
     int submenu;
-        printf("\nSubmenu - Analise a compatibilidade:\n");
-        printf("1. Comparar todos as pessoas\n");
-        printf("2. Exibir compatibilidade de pessoa especifica\n");
-        printf("3. Exibir compatibilidade entre duas pessoas especificas\n");
-        printf("0. Voltar ao menu principal\n");
-        printf("Escolha uma opcao: ");
+    printf("\nSubmenu - Analise a compatibilidade:\n");
+    printf("1. Comparar todos as pessoas\n");
+    printf("2. Exibir compatibilidade de pessoa especifica\n");
+    printf("3. Exibir compatibilidade entre duas pessoas especificas\n");
+    printf("3. Exibir entre duas idades\n");
+    printf("3. Exibir compatibilidade entre genero especifico\n");
+    printf("3. Exibir compatibilidade entre hobbies especifico\n");
+    printf("0. Voltar ao menu principal\n");
+    printf("Escolha uma opcao: ");
 
-        scanf("%d", &submenu);
+    scanf("%d", &submenu);
 
-        switch (submenu)
+    switch (submenu)
+    {
+    case 1:
+        for (int i = 0; i < numPessoas; i++)
         {
-        case 1:
+            for (int j = i + 1; j < numPessoas; j++)
+            {
+                float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+            }
+        }
+        break;
+    case 2:
+        printf("Digite o nome da pessoa para comparar: ");
+        char nomePessoaComparar[100];
+        getchar();  // Limpar o caractere de nova linha pendente no buffer
+        fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
+        nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
+
+        struct Pessoa pessoaComparar;
+        int encontrouPessoaComparar = 0;
+
+        for (int i = 0; i < numPessoas; i++)
+        {
+            if (strcmp(pessoas[i].nome, nomePessoaComparar) == 0)
+            {
+                pessoaComparar = pessoas[i];
+                encontrouPessoaComparar = 1;
+                break;
+            }
+        }
+
+        if (encontrouPessoaComparar)
+        {
             for (int i = 0; i < numPessoas; i++)
             {
-                for (int j = i + 1; j < numPessoas; j++)
+                if (strcmp(pessoas[i].nome, pessoaComparar.nome) != 0)
+                {
+                    float compatibilidade = analiseCompatibilidade(pessoaComparar, pessoas[i]);
+                    printf("Compatibilidade entre %s e %s: %.2f%%\n",pessoaComparar.nome, pessoas[i].nome, compatibilidade);
+                }
+            }
+        }
+        else
+        {
+            printf("A pessoa especificada para comparar não foi encontrada.\n");
+        }
+        break;
+
+
+    case 3:
+        getchar();
+        printf("Digite o nome da primeira pessoa: ");
+        char nomePessoa1[100];
+        fgets(nomePessoa1, sizeof(nomePessoa1), stdin);
+        nomePessoa1[strcspn(nomePessoa1, "\n")] = '\0';
+
+        printf("Digite o nome da segunda pessoa: ");
+        char nomePessoa2[100];
+        fgets(nomePessoa2, sizeof(nomePessoa2), stdin);
+        nomePessoa2[strcspn(nomePessoa2, "\n")] = '\0';
+
+        struct Pessoa pessoa1, pessoa2;
+        int encontrouPessoa1 = 0, encontrouPessoa2 = 0;
+
+        for (int i = 0; i < numPessoas; i++)
+        {
+            if (strcmp(pessoas[i].nome, nomePessoa1) == 0)
+            {
+                pessoa1 = pessoas[i];
+                encontrouPessoa1 = 1;
+                break;
+            }
+        }
+
+        for (int i = 0; i < numPessoas; i++)
+        {
+            if (strcmp(pessoas[i].nome, nomePessoa2) == 0)
+            {
+                pessoa2 = pessoas[i];
+                encontrouPessoa2 = 1;
+                break;
+            }
+        }
+
+        if (encontrouPessoa1 && encontrouPessoa2)
+        {
+            float compatibilidade = analiseCompatibilidade(pessoa1, pessoa2);
+            printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoa1.nome, pessoa2.nome, compatibilidade);
+        }
+        else
+        {
+            printf("Uma das pessoas especificadas não foi encontrada.\n");
+        }
+        break;
+
+    case 4:
+        printf("Digite a idade minima desejada: ");
+        scanf("%d", &idadeMinima);
+        printf("Digite a idade maxima desejada: ");
+        scanf("%d", &idadeMaxima);
+
+        for (int i = 0; i < numPessoas; i++)
+        {
+            for (int j = i + 1; j < numPessoas; j++)
+            {
+                if (calcularIdade(pessoas[i].diaNascimento,pessoas[i].mesNascimento,pessoas[i].anoNascimento) >= idadeMinima && calcularIdade(pessoas[i].diaNascimento,pessoas[i].mesNascimento,pessoas[i].anoNascimento) <= idadeMaxima &&
+                        calcularIdade(pessoas[j].diaNascimento,pessoas[j].mesNascimento,pessoas[j].anoNascimento) >= idadeMinima && calcularIdade(pessoas[j].diaNascimento,pessoas[j].mesNascimento,pessoas[j].anoNascimento) <= idadeMaxima)
                 {
                     float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
                     printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
                 }
             }
-            break;
-        case 2:
-            printf("Digite o nome da pessoa para comparar: ");
-            char nomePessoaComparar[100];
-            getchar();  // Limpar o caractere de nova linha pendente no buffer
-            fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
-            nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
-
-            struct Pessoa pessoaComparar;
-            int encontrouPessoaComparar = 0;
-
-            for (int i = 0; i < numPessoas; i++)
-            {
-                if (strcmp(pessoas[i].nome, nomePessoaComparar) == 0)
-                {
-                    pessoaComparar = pessoas[i];
-                    encontrouPessoaComparar = 1;
-                    break;
-                }
-            }
-
-            if (encontrouPessoaComparar)
-            {
-                for (int i = 0; i < numPessoas; i++)
-                {
-                    if (strcmp(pessoas[i].nome, pessoaComparar.nome) != 0)
-                    {
-                        float compatibilidade = analiseCompatibilidade(pessoaComparar, pessoas[i]);
-                        printf("Compatibilidade entre %s e %s: %.2f%%\n",pessoaComparar.nome, pessoas[i].nome, compatibilidade);
-                    }
-                }
-            }
-            else
-            {
-                printf("A pessoa especificada para comparar não foi encontrada.\n");
-            }
-            break;
-
-
-        case 3:
-            getchar();
-            printf("Digite o nome da primeira pessoa: ");
-            char nomePessoa1[100];
-            fgets(nomePessoa1, sizeof(nomePessoa1), stdin);
-            nomePessoa1[strcspn(nomePessoa1, "\n")] = '\0';
-
-            printf("Digite o nome da segunda pessoa: ");
-            char nomePessoa2[100];
-            fgets(nomePessoa2, sizeof(nomePessoa2), stdin);
-            nomePessoa2[strcspn(nomePessoa2, "\n")] = '\0';
-
-            struct Pessoa pessoa1, pessoa2;
-            int encontrouPessoa1 = 0, encontrouPessoa2 = 0;
-
-            for (int i = 0; i < numPessoas; i++)
-            {
-                if (strcmp(pessoas[i].nome, nomePessoa1) == 0)
-                {
-                    pessoa1 = pessoas[i];
-                    encontrouPessoa1 = 1;
-                    break;
-                }
-            }
-
-            for (int i = 0; i < numPessoas; i++)
-            {
-                if (strcmp(pessoas[i].nome, nomePessoa2) == 0)
-                {
-                    pessoa2 = pessoas[i];
-                    encontrouPessoa2 = 1;
-                    break;
-                }
-            }
-
-            if (encontrouPessoa1 && encontrouPessoa2)
-            {
-                float compatibilidade = analiseCompatibilidade(pessoa1, pessoa2);
-                printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoa1.nome, pessoa2.nome, compatibilidade);
-            }
-            else
-            {
-                printf("Uma das pessoas especificadas não foi encontrada.\n");
-            }
-            break;
-
-        case 0:
-            printf("Voltando ao menu principal.\n");
-            return;
-
-        default:
-            printf("Opcao invalida.\n");
-            break;
         }
+        break;
+
+    case 5:
+    printf("Escolha o genero desejado:\n");
+    printf("M. Masculino\n");
+    printf("F. Feminino\n");
+    printf("O. Outros\n");
+    getchar();
+    scanf("%c", &generoDesejado);
+
+    if (generoDesejado[0] == 'M' || generoDesejado[0] == 'm')
+    {
+        strcpy(generoDesejado, "Masculino");
+    }
+    else if (generoDesejado[0] == 'F' || generoDesejado[0] == 'f')
+    {
+        strcpy(generoDesejado, "Feminino");
+    }
+    else if (generoDesejado[0] == 'O' || generoDesejado[0] == 'o')
+    {
+        strcpy(generoDesejado, "Outros");
+    }
+    else
+    {
+        printf("Genero errado\n");
+        break;
     }
 
+    for (int i = 0; i < numPessoas; i++)
+    {
+        if (strcmp(pessoas[i].genero, generoDesejado) == 0)
+        {
+            for (int j = i + 1; j < numPessoas; j++)
+            {
+                if (strcmp(pessoas[j].genero, generoDesejado) == 0)
+                {
+                    float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                    printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                }
+            }
+        }
+    }
+    case 0:
+        printf("Voltando ao menu principal.\n");
+        return;
 
-float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2) {
+    default:
+        printf("Opcao invalida.\n");
+        break;
+    }
+}
+
+
+float analiseCompatibilidade(struct Pessoa pessoa1, struct Pessoa pessoa2)
+{
     int totalInteresses = 0;
     int interessesComuns = 0;
 
     // Hobbies
     int interessesHobbies = 0;
-    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica) {
+    if (pessoa1.hobbies.musica == pessoa2.hobbies.musica)
+    {
         interessesHobbies++;
     }
-    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura) {
+    if (pessoa1.hobbies.leitura == pessoa2.hobbies.leitura)
+    {
         interessesHobbies++;
     }
-    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes) {
+    if (pessoa1.hobbies.esportes == pessoa2.hobbies.esportes)
+    {
         interessesHobbies++;
     }
-    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar) {
+    if (pessoa1.hobbies.cozinhar == pessoa2.hobbies.cozinhar)
+    {
         interessesHobbies++;
     }
 
-    if (interessesHobbies == 4) {
+    if (interessesHobbies == 4)
+    {
         interessesComuns += 32;
-    } else if (interessesHobbies == 3) {
+    }
+    else if (interessesHobbies == 3)
+    {
         interessesComuns += 16;
-    }else if (interessesHobbies == 2) {
+    }
+    else if (interessesHobbies == 2)
+    {
         interessesComuns += 8;
-    } else if (interessesHobbies == 1) {
+    }
+    else if (interessesHobbies == 1)
+    {
         interessesComuns += 4;
     }
     totalInteresses += 32;
 
     // Locais
     int interessesLocais = 0;
-    if (pessoa1.local.viajar == pessoa2.local.viajar) {
+    if (pessoa1.local.viajar == pessoa2.local.viajar)
+    {
         interessesLocais++;
     }
-    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa) {
+    if (pessoa1.local.ficarEmCasa == pessoa2.local.ficarEmCasa)
+    {
         interessesLocais++;
     }
-    if (pessoa1.local.praia == pessoa2.local.praia) {
+    if (pessoa1.local.praia == pessoa2.local.praia)
+    {
         interessesLocais++;
     }
 
-    if (interessesLocais == 3) {
+    if (interessesLocais == 3)
+    {
         interessesComuns += 32;
-    } else if (interessesLocais == 2) {
+    }
+    else if (interessesLocais == 2)
+    {
         interessesComuns += 16;
-    }else if (interessesLocais == 1) {
+    }
+    else if (interessesLocais == 1)
+    {
         interessesComuns += 8;
     }
     totalInteresses += 32;
 
     // Filmes
     int interessesFilmes = 0;
-    if (pessoa1.filmes.acao == pessoa2.filmes.acao) {
+    if (pessoa1.filmes.acao == pessoa2.filmes.acao)
+    {
         interessesFilmes++;
     }
-    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura) {
+    if (pessoa1.filmes.aventura == pessoa2.filmes.aventura)
+    {
         interessesFilmes++;
     }
-    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia) {
+    if (pessoa1.filmes.comedia == pessoa2.filmes.comedia)
+    {
         interessesFilmes++;
     }
-    if (pessoa1.filmes.drama == pessoa2.filmes.drama) {
+    if (pessoa1.filmes.drama == pessoa2.filmes.drama)
+    {
         interessesFilmes++;
     }
-    if (pessoa1.filmes.terror == pessoa2.filmes.terror) {
+    if (pessoa1.filmes.terror == pessoa2.filmes.terror)
+    {
         interessesFilmes++;
     }
-    if (pessoa1.filmes.trash == pessoa2.filmes.trash) {
+    if (pessoa1.filmes.trash == pessoa2.filmes.trash)
+    {
         interessesFilmes++;
     }
 
-    if (interessesFilmes  == 6) {
+    if (interessesFilmes  == 6)
+    {
         interessesComuns += 32;
-    } else if (interessesFilmes == 5) {
+    }
+    else if (interessesFilmes == 5)
+    {
         interessesComuns += 16;
-    } else if (interessesFilmes == 4) {
+    }
+    else if (interessesFilmes == 4)
+    {
         interessesComuns += 8;
-    }else if (interessesFilmes == 3) {
+    }
+    else if (interessesFilmes == 3)
+    {
         interessesComuns += 4;
-    }else if (interessesFilmes == 2) {
+    }
+    else if (interessesFilmes == 2)
+    {
         interessesComuns += 2;
-    }else if (interessesFilmes == 1) {
+    }
+    else if (interessesFilmes == 1)
+    {
         interessesComuns += 1;
     }
     totalInteresses += 32;
