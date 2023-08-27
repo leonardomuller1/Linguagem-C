@@ -295,9 +295,9 @@ void listarPessoas()
     printf("4. Filtrar por genero outros\n");
     printf("5. Filtrar por pessoa especifica\n");
     printf("6. Filtrar por idade\n");
-    printf("7. Filtrar por hobby\n"); // Nova opção para filtrar por hobby
-    printf("8. Filtrar por local\n"); // Nova opção para filtrar por local
-    printf("9. Filtrar por genero de filme\n"); // Nova opção para filtrar por gênero de filme
+    printf("7. Filtrar por hobbie\n");
+    printf("8. Filtrar por local\n");
+    printf("9. Filtrar por genero de filme\n");
     printf("0. Sair\n");
     printf("Escolha uma opcao: ");
 
@@ -377,8 +377,8 @@ void listarPessoas()
         }
         fclose(arquivo);
         break;
-    case 7: // Filtro por hobby
-        printf("\nFiltrando por hobby:\n");
+    case 7:
+        printf("\nFiltrando por hobbie:\n");
         int hobbyFiltro;
         printf("Escolha um hobby:\n");
         printf("1. Musica\n");
@@ -415,7 +415,7 @@ void listarPessoas()
         fclose(arquivo);
         break;
 
-    case 8: // Filtro por local
+    case 8:
         printf("\nFiltrando por local:\n");
         int localFiltro;
         printf("Escolha um local:\n");
@@ -449,7 +449,7 @@ void listarPessoas()
         fclose(arquivo);
         break;
 
-    case 9: // Filtro por gênero de filme
+    case 9:
         printf("\nFiltrando por genero de filme:\n");
         int generoFilmeFiltro;
         printf("Escolha um genero de filme:\n");
@@ -590,6 +590,8 @@ void compararPessoas()
     printf("4. Exibir entre duas idades\n");
     printf("5. Exibir compatibilidade entre genero especifico\n");
     printf("6. Exibir compatibilidade entre hobbies especifico\n");
+    printf("7. Exibir compatibilidade entre locais especifico\n");
+    printf("8. Exibir compatibilidade entre filmes especifico\n");
     printf("0. Voltar ao menu principal\n");
     printf("Escolha uma opcao: ");
 
@@ -610,7 +612,7 @@ void compararPessoas()
     case 2:
         printf("Digite o nome da pessoa para comparar: ");
         char nomePessoaComparar[100];
-        getchar();  // Limpar o caractere de nova linha pendente no buffer
+        getchar();
         fgets(nomePessoaComparar, sizeof(nomePessoaComparar), stdin);
         nomePessoaComparar[strcspn(nomePessoaComparar, "\n")] = '\0';
 
@@ -712,45 +714,279 @@ void compararPessoas()
         break;
 
     case 5:
-    printf("Escolha o genero desejado:\n");
-    printf("M. Masculino\n");
-    printf("F. Feminino\n");
-    printf("O. Outros\n");
-    getchar();
-    scanf("%c", &generoDesejado);
+        printf("Escolha o genero desejado:\n");
+        printf("M. Masculino\n");
+        printf("F. Feminino\n");
+        printf("O. Outros\n");
+        getchar();
+        scanf("%c", &generoDesejado);
 
-    if (generoDesejado[0] == 'M' || generoDesejado[0] == 'm')
-    {
-        strcpy(generoDesejado, "Masculino");
-    }
-    else if (generoDesejado[0] == 'F' || generoDesejado[0] == 'f')
-    {
-        strcpy(generoDesejado, "Feminino");
-    }
-    else if (generoDesejado[0] == 'O' || generoDesejado[0] == 'o')
-    {
-        strcpy(generoDesejado, "Outros");
-    }
-    else
-    {
-        printf("Genero errado\n");
-        break;
-    }
-
-    for (int i = 0; i < numPessoas; i++)
-    {
-        if (strcmp(pessoas[i].genero, generoDesejado) == 0)
+        if (generoDesejado[0] == 'M' || generoDesejado[0] == 'm')
         {
-            for (int j = i + 1; j < numPessoas; j++)
+            strcpy(generoDesejado, "Masculino");
+        }
+        else if (generoDesejado[0] == 'F' || generoDesejado[0] == 'f')
+        {
+            strcpy(generoDesejado, "Feminino");
+        }
+        else if (generoDesejado[0] == 'O' || generoDesejado[0] == 'o')
+        {
+            strcpy(generoDesejado, "Outros");
+        }
+        else
+        {
+            printf("Genero errado\n");
+            break;
+        }
+
+        for (int i = 0; i < numPessoas; i++)
+        {
+            if (strcmp(pessoas[i].genero, generoDesejado) == 0)
             {
-                if (strcmp(pessoas[j].genero, generoDesejado) == 0)
+                for (int j = i + 1; j < numPessoas; j++)
                 {
-                    float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
-                    printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    if (strcmp(pessoas[j].genero, generoDesejado) == 0)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
                 }
             }
         }
-    }
+        break;
+    case 6:
+        printf("\nFiltrando por hobbie:\n");
+        int hobbyFiltro;
+        printf("Escolha um hobby:\n");
+        printf("1. Musica\n");
+        printf("2. Leitura\n");
+        printf("3. Esportes\n");
+        printf("4. Cozinhar\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &hobbyFiltro);
+
+        if (hobbyFiltro == 1)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].hobbies.musica == 1 && pessoas[j].hobbies.musica == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (hobbyFiltro == 2)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].hobbies.leitura == 1 && pessoas[j].hobbies.leitura == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (hobbyFiltro == 3)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].hobbies.esportes == 1 && pessoas[j].hobbies.esportes == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (hobbyFiltro == 4)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].hobbies.cozinhar == 1 && pessoas[j].hobbies.cozinhar == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else
+        {
+            printf("Hobbie errado\n");
+            break;
+        }
+        break;
+    case 7:
+        printf("\nFiltrando por local:\n");
+        int localFiltro;
+        printf("Escolha um local:\n");
+        printf("1. Viajar\n");
+        printf("2. Ficar em casa\n");
+        printf("3. Praia\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &localFiltro);
+
+        if (localFiltro == 1)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].local.viajar == 1 && pessoas[j].local.viajar == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (localFiltro == 2)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].local.ficarEmCasa == 1 && pessoas[j].local.ficarEmCasa == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (localFiltro == 3)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].local.praia == 1 && pessoas[j].local.praia == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else
+        {
+            printf("Local errado\n");
+            break;
+        }
+        break;
+    case 8:
+        printf("\nFiltrando por genero de filme:\n");
+        int generoFilmeFiltro;
+        printf("Escolha um genero de filme:\n");
+        printf("1. Acao\n");
+        printf("2. Aventura\n");
+        printf("3. Comedia\n");
+        printf("4. Drama\n");
+        printf("5. Terror\n");
+        printf("6. Trash\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &generoFilmeFiltro);
+
+        if (generoFilmeFiltro == 1)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.acao == 1 && pessoas[j].filmes.acao == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (generoFilmeFiltro == 2)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.aventura == 1 && pessoas[j].filmes.aventura == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (generoFilmeFiltro == 3)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.comedia == 1 && pessoas[j].filmes.comedia == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (generoFilmeFiltro == 4)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.drama == 1 && pessoas[j].filmes.drama == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (generoFilmeFiltro == 5)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.terror == 1 && pessoas[j].filmes.terror == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else if (generoFilmeFiltro == 6)
+        {
+            for (int i = 0; i < numPessoas; i++)
+            {
+                for (int j = i + 1; j < numPessoas; j++)
+                {
+                    if (pessoas[i].filmes.trash == 1 && pessoas[j].filmes.trash == 1)
+                    {
+                        float compatibilidade = analiseCompatibilidade(pessoas[i], pessoas[j]);
+                        printf("Compatibilidade entre %s e %s: %.2f%%\n", pessoas[i].nome, pessoas[j].nome, compatibilidade);
+                    }
+                }
+            }
+        }
+        else
+        {
+            printf("Filme errado\n");
+            break;
+        }
     case 0:
         printf("Voltando ao menu principal.\n");
         return;
