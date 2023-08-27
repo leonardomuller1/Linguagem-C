@@ -295,6 +295,9 @@ void listarPessoas()
     printf("4. Filtrar por genero outros\n");
     printf("5. Filtrar por pessoa especifica\n");
     printf("6. Filtrar por idade\n");
+    printf("7. Filtrar por hobby\n"); // Nova opção para filtrar por hobby
+    printf("8. Filtrar por local\n"); // Nova opção para filtrar por local
+    printf("9. Filtrar por genero de filme\n"); // Nova opção para filtrar por gênero de filme
     printf("0. Sair\n");
     printf("Escolha uma opcao: ");
 
@@ -374,6 +377,121 @@ void listarPessoas()
         }
         fclose(arquivo);
         break;
+     case 7: // Filtro por hobby
+        printf("\nFiltrando por hobby:\n");
+        int hobbyFiltro;
+        printf("Escolha um hobby:\n");
+        printf("1. Musica\n");
+        printf("2. Leitura\n");
+        printf("3. Esportes\n");
+        printf("4. Cozinhar\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &hobbyFiltro);
+
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            int hobbySelecionado = 0;
+            switch (hobbyFiltro)
+            {
+            case 1:
+                hobbySelecionado = pessoa.hobbies.musica;
+                break;
+            case 2:
+                hobbySelecionado = pessoa.hobbies.leitura;
+                break;
+            case 3:
+                hobbySelecionado = pessoa.hobbies.esportes;
+                break;
+            case 4:
+                hobbySelecionado = pessoa.hobbies.cozinhar;
+                break;
+            }
+
+            if (hobbySelecionado == 1)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+
+    case 8: // Filtro por local
+        printf("\nFiltrando por local:\n");
+        int localFiltro;
+        printf("Escolha um local:\n");
+        printf("1. Viajar\n");
+        printf("2. Ficar em casa\n");
+        printf("3. Praia\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &localFiltro);
+
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            int localSelecionado = 0;
+            switch (localFiltro)
+            {
+            case 1:
+                localSelecionado = pessoa.local.viajar;
+                break;
+            case 2:
+                localSelecionado = pessoa.local.ficarEmCasa;
+                break;
+            case 3:
+                localSelecionado = pessoa.local.praia;
+                break;
+            }
+
+            if (localSelecionado == 1)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
+        fclose(arquivo);
+        break;
+
+    case 9: // Filtro por gênero de filme
+        printf("\nFiltrando por genero de filme:\n");
+        int generoFilmeFiltro;
+        printf("Escolha um genero de filme:\n");
+        printf("1. Acao\n");
+        printf("2. Aventura\n");
+        printf("3. Comedia\n");
+        printf("4. Drama\n");
+        printf("5. Terror\n");
+        printf("6. Trash\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &generoFilmeFiltro);
+
+        while (fread(&pessoa, sizeof(struct Pessoa), 1, arquivo) == 1)
+        {
+            int generoFilmeSelecionado = 0;
+            switch (generoFilmeFiltro)
+            {
+            case 1:
+                generoFilmeSelecionado = pessoa.filmes.acao;
+                break;
+            case 2:
+                generoFilmeSelecionado = pessoa.filmes.aventura;
+                break;
+            case 3:
+                generoFilmeSelecionado = pessoa.filmes.comedia;
+                break;
+            case 4:
+                generoFilmeSelecionado = pessoa.filmes.drama;
+                break;
+            case 5:
+                generoFilmeSelecionado = pessoa.filmes.terror;
+                break;
+            case 6:
+                generoFilmeSelecionado = pessoa.filmes.trash;
+                break;
+            }
+
+            if (generoFilmeSelecionado == 1)
+            {
+                exibicaoPessoa(&pessoa);
+            }
+        }
     case 0:
         break;
     default:
