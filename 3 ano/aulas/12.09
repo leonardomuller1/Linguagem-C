@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+int main()
+{
+    FILE *arq;
+    int n, m, i, j;
+    double somaLinha[100]; // Tamanho máximo para somaLinha
+    double somaColuna[100]; // Tamanho máximo para somaColuna
+    double a;
+    arq = fopen("dados.txt", "r");
+    fscanf(arq, "%d %d", &n, &m);
+    printf("n = %d\nm = %d\n", n, m);
+
+    for (i = 0; i < n; i++)
+    {
+        somaLinha[i] = 0.0;
+        for (j = 0; j < m; j++)
+        {
+            fscanf(arq, "%lf", &a);
+            somaLinha[i] += a;
+            somaColuna[j] += a;
+        }
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        printf("Soma linha %d = %.2lf\n", i, somaLinha[i]);
+    }
+    for (j = 0; j < m; j++)
+    {
+        printf("Soma coluna %d = %.2lf\n", j, somaColuna[j]);
+    }
+
+    fclose(arq);
+    return 0;
+}
