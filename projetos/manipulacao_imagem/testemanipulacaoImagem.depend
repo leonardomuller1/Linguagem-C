@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1695832833 source:c:\users\leona\onedrive\documentos\testemanipulacaoimagem\main.c
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+
