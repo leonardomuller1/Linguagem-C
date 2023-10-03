@@ -2,7 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
-typedef struct {
+typedef struct
+{
     uint16_t  type;             // Magic identifier: 0x4d42
     uint32_t  size;             // File size in bytes
     uint16_t  reserved1;        // Not used
@@ -21,7 +22,8 @@ typedef struct {
     uint32_t  important_colors; // Important colors
 } __attribute__((packed)) BMPHeader;
 
-int main() {
+int main()
+{
     char inputFilename[256];
     char outputFilenameGrayScale[256];
     char outputFilenameRGB[256];
@@ -42,20 +44,23 @@ int main() {
     outputFileGrayScale = fopen(outputFilenameGrayScale, "wb");
     outputFileRGB = fopen(outputFilenameRGB, "wb");
 
-    if (inputFile == NULL) {
+    if (inputFile == NULL)
+    {
         printf("Erro ao abrir o arquivo BMP de entrada.\n");
         return 1;
     }
 
     BMPHeader header;
 
-    if (fread(&header, sizeof(BMPHeader), 1, inputFile) != 1) {
+    if (fread(&header, sizeof(BMPHeader), 1, inputFile) != 1)
+    {
         printf("Erro ao ler o cabeçalho BMP de entrada.\n");
         fclose(inputFile);
         return 1;
     }
 
-    if (header.type != 0x4D42) {
+    if (header.type != 0x4D42)
+    {
         printf("O arquivo de entrada não é um BMP válido.\n");
         fclose(inputFile);
         return 1;
@@ -63,14 +68,17 @@ int main() {
 
     fwrite(&header, sizeof(BMPHeader), 1, outputFileGrayScale);
     fwrite(&header, sizeof(BMPHeader), 1, outputFileRGB);
-
-int rowSize = ((header.width_px * header.bits_per_pixel / 8 + 3) / 4) * 4;
+    int rowSize = ((header.width_px * 3 + 3) / 4) * 4;
+    int paddingSize = rowSize - (header.width_px * 3);
 
     char pixelData[3];
 
-    for (int i = 0; i < header.height_px; i++) {
-        for (int j = 0; j < rowSize; j += 3) {
-            if (fread(pixelData, 1, 3, inputFile) != 3) {
+    for (int i = 0; i < header.height_px; i++)
+    {
+        for (int j = 0; j < header.width_px; j++)
+        {
+            if (fread(pixelData, 1, 3, inputFile) != 3)
+            {
                 printf("Erro na leitura dos dados da imagem.\n");
                 fclose(inputFile);
                 return 1;
@@ -81,7 +89,7 @@ int rowSize = ((header.width_px * header.bits_per_pixel / 8 + 3) / 4) * 4;
             char green = pixelData[1];
             char blue = pixelData[0];
 
-            char grayValue = (0.299 * pixelData[2] + 0.587 * pixelData[1] + 0.114 * pixelData[0]);
+            char grayValue = (0.299 * red + 0.587 * green + 0.114 * blue);
             grayValue = 255 - grayValue;
 
             pixelData[0] = grayValue;
@@ -95,6 +103,14 @@ int rowSize = ((header.width_px * header.bits_per_pixel / 8 + 3) / 4) * 4;
             pixelData[2] = blue;
 
             fwrite(pixelData, 1, 3, outputFileRGB);
+        }
+
+        // Pule qualquer byte de preenchimento na linha
+        if (paddingSize > 0)
+        {
+            fread(0, 1, paddingSize,  inputFile);
+            fwrite(0, 1, paddingSize, outputFileGrayScale);
+            fwrite(0, 1, paddingSize, outputFileRGB);
         }
     }
 
