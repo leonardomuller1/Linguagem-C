@@ -19,93 +19,90 @@ typedef struct {
     int32_t   y_resolution_ppm; // Pixels per meter
     uint32_t  num_colors;       // Number of colors
     uint32_t  important_colors; // Important colors
-} __attribute__((packed)) BMPHeader;;
+} __attribute__((packed)) BMPHeader;
 
 int main() {
-    char inputFilename[256];  // Nome do arquivo de entrada
-    char outputFilename[256]; // Nome do arquivo de saída
+    char inputFilename[256];
+    char outputFilenameGrayScale[256];
+    char outputFilenameRGB[256];
 
-    printf("Digite o nome do arquivo BMP de entrada (por exemplo, 'minhafoto'): ");
-    scanf("%s", inputFilename);
+    FILE *inputFile, *outputFileGrayScale, *outputFileRGB;
 
-    // Adicione a extensão .bmp ao nome do arquivo de entrada
-    char fullInputFilename[256];
-    snprintf(fullInputFilename, sizeof(fullInputFilename), "%s.bmp", inputFilename);
+    printf("Digite o nome do arquivo BMP de entrada: ");
+    fgets(inputFilename, sizeof(inputFilename), stdin);
+    inputFilename[strcspn(inputFilename, "\n")] = '\0';
 
-    printf("Digite o nome do arquivo BMP de saída (por exemplo, 'saida'): ");
-    scanf("%s", outputFilename);
+    strcpy(outputFilenameGrayScale, inputFilename);
+    strcpy(outputFilenameRGB, inputFilename);
+    strcat(inputFilename, ".bmp");
+    strcat(outputFilenameGrayScale, "_gs.bmp");
+    strcat(outputFilenameRGB, "_rgb.bmp");
 
-    // Adicione a extensão .bmp ao nome do arquivo de saída
-    char fullOutputFilename[256];
-    snprintf(fullOutputFilename, sizeof(fullOutputFilename), "%s.bmp", outputFilename);
-
-    FILE *inputFile = fopen(fullInputFilename, "rb");
-    FILE *outputFile = fopen(fullOutputFilename, "wb");
+    inputFile = fopen(inputFilename, "rb");
+    outputFileGrayScale = fopen(outputFilenameGrayScale, "wb");
+    outputFileRGB = fopen(outputFilenameRGB, "wb");
 
     if (inputFile == NULL) {
         printf("Erro ao abrir o arquivo BMP de entrada.\n");
         return 1;
     }
 
-    if (outputFile == NULL) {
-        printf("Erro ao criar o arquivo BMP de saída.\n");
-        fclose(inputFile);
-        return 1;
-    }
-
     BMPHeader header;
 
     if (fread(&header, sizeof(BMPHeader), 1, inputFile) != 1) {
-        printf("Erro ao ler o cabeçalho BMP de entrada.\n");
+        printf("Erro ao ler o cabeÃ§alho BMP de entrada.\n");
         fclose(inputFile);
-        fclose(outputFile);
         return 1;
     }
 
-    // Verifique o campo 'type' para garantir que seja um arquivo BMP válido.
     if (header.type != 0x4D42) {
-        printf("O arquivo de entrada não é um BMP válido.\n");
+        printf("O arquivo de entrada nÃ£o Ã© um BMP vÃ¡lido.\n");
         fclose(inputFile);
-        fclose(outputFile);
         return 1;
     }
 
-    // Escreva o cabeçalho BMP no arquivo de saída
-    fwrite(&header, sizeof(BMPHeader), 1, outputFile);
+    fwrite(&header, sizeof(BMPHeader), 1, outputFileGrayScale);
+    fwrite(&header, sizeof(BMPHeader), 1, outputFileRGB);
 
-    // Determine o número de bytes de dados de imagem por linha
-    int rowSize = (header.width_px * (header.bits_per_pixel / 8));
+int rowSize = ((header.width_px * header.bits_per_pixel / 8 + 3) / 4) * 4;
 
-    // Ajuste o tamanho da linha para ser múltiplo de 4 bytes (requisito BMP)
-    if (rowSize % 4 != 0) {
-        rowSize += (4 - (rowSize % 4));
-    }
-
-    char pixelData[3]; // Para armazenar os dados do pixel lido (BGR)
+    char pixelData[3];
 
     for (int i = 0; i < header.height_px; i++) {
-        for (int j = 0; j < rowSize; j += 3) { // Processa três bytes por vez (BGR)
+        for (int j = 0; j < rowSize; j += 3) {
             if (fread(pixelData, 1, 3, inputFile) != 3) {
                 printf("Erro na leitura dos dados da imagem.\n");
                 fclose(inputFile);
-                fclose(outputFile);
                 return 1;
             }
 
-            // Mantenha apenas a componente azul e zere as componentes vermelha e verde
-            pixelData[0] = 0; // Azul
-            pixelData[1] = 0; // Vermelho
-            pixelData[2] = 0; // Verde
+            // Inverta as cores RGB para a imagem RGB
+            char red = pixelData[2];
+            char green = pixelData[1];
+            char blue = pixelData[0];
 
-            // Escreva o pixel modificado no arquivo de saída
-            fwrite(pixelData, 1, 3, outputFile);
+            char grayValue = (0.299 * pixelData[2] + 0.587 * pixelData[1] + 0.114 * pixelData[0]);
+            grayValue = 255 - grayValue;
+
+            pixelData[0] = grayValue;
+            pixelData[1] = grayValue;
+            pixelData[2] = grayValue;
+
+            fwrite(pixelData, 1, 3, outputFileGrayScale);
+
+            pixelData[0] = red;
+            pixelData[1] = green;
+            pixelData[2] = blue;
+
+            fwrite(pixelData, 1, 3, outputFileRGB);
         }
     }
 
     fclose(inputFile);
-    fclose(outputFile);
+    fclose(outputFileGrayScale);
+    fclose(outputFileRGB);
 
-    printf("Manipulação de cores concluída com sucesso. O arquivo BMP de saída foi criado.\n");
+    printf("Manipulacao de cores concluida com sucesso. Os arquivos BMP de saida foram criados.\n");
 
     return 0;
 }
